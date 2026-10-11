@@ -185,7 +185,7 @@ export function scoreAttempt(args: {
       if (s.scaleFactor?.value) scaledPoints = rawPoints * s.scaleFactor.value;
       else if (rawMax && s.scaledMax.value) scaledPoints = (rawPoints * s.scaledMax.value) / rawMax;
       else scaledPoints = rawPoints;
-      scaledPoints = bp.scoring.rounding.value === "round_each_section" ? Math.round(scaledPoints) : round1(scaledPoints);
+      scaledPoints = bp.scoring.rounding.value === "round_each_section" ? Math.round(scaledPoints) : Math.round(scaledPoints * 100) / 100;
       if (scaledMax !== null) scaledPoints = Math.min(scaledPoints, scaledMax);
     }
     return {
