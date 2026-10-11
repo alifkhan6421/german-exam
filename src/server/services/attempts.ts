@@ -49,13 +49,16 @@ async function event(db: Db, attemptId: string, type: string, payload: Record<st
   await db.query(`insert into attempt_events (attempt_id, type, payload) values ($1, $2, $3::jsonb)`, [attemptId, type, JSON.stringify(payload)]);
 }
 
-async function loadRow(db: Db, attemptId: string, userId: string) {
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+export async function loadRow(db: Db, attemptId: string, userId: string) {
+  if (!UUID_RE.test(attemptId)) throw new DomainError("Attempt not found", 404);
   const row = await db.one<AttemptRow>(`select * from attempts where id = $1`, [attemptId]);
   if (!row || row.user_id !== userId) throw new DomainError("Attempt not found", 404);
   return row;
 }
 
-async function versionFor(db: Db, row: Pick<AttemptRow, "exam_version_id">) {
+export async function versionFor(db: Db, row: Pick<AttemptRow, "exam_version_id">) {
   const v = await db.one<{ content: unknown; blueprint_key: string; blueprint_version: string }>(
     `select content, blueprint_key, blueprint_version from exam_versions where id = $1`,
     [row.exam_version_id],
@@ -205,7 +208,7 @@ export async function getAttemptView(db: Db, userId: string, attemptId: string, 
   };
 }
 
-async function loadAnswers(db: Db, attemptId: string): Promise<Record<string, AnswerValue>> {
+export async function loadAnswers(db: Db, attemptId: string): Promise<Record<string, AnswerValue>> {
   const rows = await db.query<{ item_id: string; value: unknown }>(`select item_id, value from attempt_answers where attempt_id = $1`, [attemptId]);
   const out: Record<string, AnswerValue> = {};
   for (const r of rows) {

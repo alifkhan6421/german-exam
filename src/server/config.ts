@@ -50,7 +50,7 @@ export const config = {
     provider: (env("LLM_PROVIDER") ?? "anthropic") as "anthropic",
     apiKey: env("ANTHROPIC_API_KEY"),
     generationModel: env("LLM_GENERATION_MODEL") ?? "claude-opus-5-5",
-    assessmentModel: env("LLM_ASSESSMENT_MODEL") ?? "claude-sonnet-5-5",
+    assessmentModel: env("LLM_ASSESSMENT_MODEL") ?? "claude-opus-5-5",
     get configured() {
       return !!this.apiKey;
     },

@@ -7,9 +7,9 @@ import type { AttemptView } from "@/server/services/attempts";
 import type { AnswerValue, Item, Option, Part, Stimulus } from "@/domain/exam/schema";
 import { cn, formatDuration } from "@/lib/utils";
 import { api, ApiError } from "./api";
-import { RichText } from "./rich-text";
 import { AudioPlayer } from "./audio-player";
 import { Recorder } from "./recorder";
+import { TextStimulus } from "./text-stimulus";
 
 type SaveState = "saving" | "saved" | "error" | "locked";
 type CheckResult = { correct: boolean; correctAnswers: string[]; explanation: string | null; evidence: string | null; explanationsLocked: boolean };
@@ -494,28 +494,7 @@ function StimulusView({ st, view, listening, allowed, preview }: { st: Stimulus;
       />
     );
   }
-  const frame: Record<string, string> = {
-    email: "rounded-lg border border-paper-line bg-white p-4 shadow-sm",
-    note: "rotate-[-0.3deg] rounded-sm border border-amber-200 bg-amber-50 p-4 shadow-sm",
-    ad: "rounded-md border-2 border-ink-200 bg-white p-3",
-    notice: "rounded-md border-2 border-ink-800 bg-white p-4 text-center",
-    form: "rounded-lg border border-paper-line bg-white p-3",
-    card: "rounded-xl border-2 border-dashed border-telc-600/40 bg-white p-5 text-center text-lg",
-    image: "rounded-lg border border-dashed border-ink-300 bg-ink-50 p-6 text-center text-sm text-ink-500",
-    table: "rounded-lg border border-paper-line bg-white p-3",
-  };
-  return (
-    <figure className={frame[st.kind] ?? ""}>
-      {(st.label || st.title) && (
-        <figcaption className="mb-2 flex items-baseline gap-2 text-xs font-semibold uppercase tracking-wide text-ink-500">
-          {st.label && <span className="rounded bg-ink-900 px-1.5 py-0.5 text-white">{st.label}</span>}
-          {st.title}
-        </figcaption>
-      )}
-      {st.kind === "image" ? <p>[Illustration: {st.imageAlt}]</p> : <RichText text={st.body} />}
-      {st.kind === "card" && st.imageAlt && <p className="mt-1 text-xs text-ink-500">{st.imageAlt}</p>}
-    </figure>
-  );
+  return <TextStimulus st={st} />;
 }
 
 function PaperPart({
