@@ -67,6 +67,7 @@ export function Simulator({ initial, preview = false }: { initial: AttemptView; 
   /* ------------------------------ server sync ------------------------------ */
 
   const refresh = useCallback(async () => {
+    if (preview) return;
     try {
       const v = await api<AttemptView>(`/api/attempts/${view.id}`);
       setOffset(new Date(v.serverNow).getTime() - Date.now());

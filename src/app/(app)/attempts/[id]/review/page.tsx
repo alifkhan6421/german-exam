@@ -10,6 +10,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { Badge } from "@/components/ui/badge";
 import { TextStimulus } from "@/components/exam/text-stimulus";
 import { AssessmentCard, type AssessmentView } from "@/components/results/assessment-card";
+import { ReportIssue } from "@/components/results/report-issue";
 import { cn } from "@/lib/utils";
 
 export const metadata = { title: "Review" };
@@ -94,6 +95,7 @@ export default async function ReviewPage({ params }: { params: Promise<{ id: str
                         keyEntry={answerKey[item.id]}
                         assessments={assessments.filter((a) => a.item_id === item.id)}
                         mediaUrls={r.mediaUrls}
+                        attemptId={id}
                       />
                     ))}
                   </ol>
@@ -108,8 +110,9 @@ export default async function ReviewPage({ params }: { params: Promise<{ id: str
 }
 
 function ReviewItem({
-  item, part, answer, result, keyEntry, assessments, mediaUrls,
+  item, part, answer, result, keyEntry, assessments, mediaUrls, attemptId,
 }: {
+  attemptId: string;
   item: Item;
   part: Part;
   answer: AnswerValue | undefined;
@@ -157,6 +160,7 @@ function ReviewItem({
           {keyEntry?.evidence && <p className="sm:col-span-2 text-ink-500 italic">„{keyEntry.evidence}“</p>}
         </div>
       )}
+      <ReportIssue attemptId={attemptId} itemId={item.id} />
     </li>
   );
 }

@@ -30,3 +30,14 @@ export async function startAttemptAction(_: FormState, form: FormData): Promise<
   }
   redirect(`/attempts/${id}`);
 }
+
+export async function reportIssueAction(_: FormState, form: FormData): Promise<FormState> {
+  const user = await requireUser();
+  const message = String(form.get("message") ?? "").trim().slice(0, 2000);
+  if (message.length < 5) return { error: "Please describe the problem." };
+  const db = await getDb();
+  const attempt = await db.one<{ exam_version_id: string }>(`select exam_version_id from attempts where id = $1 and user_id = $2`, [String(form.get("attemptId")), user.id]);
+  if (!attempt) return { error: "Attempt not found." };
+  await db.query(`insert into issue_reports (user_id, exam_version_id, item_id, message) values ($1, $2, $3, $4)`, [user.id, attempt.exam_version_id, String(form.get("itemId") ?? "") || null, message]);
+  return { ok: true, message: "Thanks — our content team will check it." };
+}
