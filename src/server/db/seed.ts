@@ -81,7 +81,28 @@ export async function seed(db: Db, opts: { dev: boolean }) {
     }
   }
 
-  if (!opts.dev) return;
+  if (!opts.dev) {
+    // Production: import the authored Goethe A1 Mock 1 as an unpublished v1 draft only.
+    // It still needs approved studio audio, blueprint confirmation and human review before publishing.
+    const exam = await db.one<{ id: string; current_version_id: string | null }>(
+      `select id, current_version_id from exams where track_key = 'goethe-a1-sd1' and mock_number = 1`,
+    );
+    if (exam && !exam.current_version_id) {
+      const bp = getBlueprint("goethe-a1-sd1")!;
+      const content = ExamContentSchema.parse(goetheA1Mock1);
+      const report = validateExam(content, bp, { blueprintConfirmed: false, allowDevPreviewAudio: false });
+      const versionId = randomUUID();
+      await db.tx(async (tx) => {
+        await tx.query(
+          `insert into exam_versions (id, exam_id, version, blueprint_key, blueprint_version, content, status, validation, locked)
+           values ($1, $2, 1, $3, $4, $5::jsonb, 'draft', $6::jsonb, false)`,
+          [versionId, exam.id, bp.key, bp.version, JSON.stringify(content), JSON.stringify(report)],
+        );
+        await tx.query(`update exams set current_version_id = $1, updated_at = now() where id = $2`, [versionId, exam.id]);
+      });
+    }
+    return;
+  }
 
   const ids: Record<string, string> = {};
   for (const u of DEV_USERS) {

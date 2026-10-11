@@ -70,7 +70,7 @@ async function createPglite(dataDir: string): Promise<Db> {
   return wrap(base, txImpl, () => pg.close());
 }
 
-async function createPg(connectionString: string): Promise<Db> {
+export async function createPg(connectionString: string): Promise<Db> {
   const { Pool } = await import("pg");
   const pool = new Pool({ connectionString, max: 5, ssl: connectionString.includes("localhost") ? undefined : { rejectUnauthorized: false } });
   const txImpl: Db["tx"] = async (fn) => {
@@ -132,11 +132,11 @@ export function getDb(): Promise<Db> {
 }
 
 /** Fresh in-memory database for tests. */
-export async function createTestDb(): Promise<Db> {
+export async function createTestDb(opts: { devSeed?: boolean } = {}): Promise<Db> {
   const db = await createPglite("memory://");
   await migrate(db, { includeDev: true });
   const { seed } = await import("./seed");
-  await seed(db, { dev: true });
+  await seed(db, { dev: opts.devSeed ?? true });
   return db;
 }
 
