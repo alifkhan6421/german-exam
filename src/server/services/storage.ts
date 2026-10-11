@@ -3,6 +3,7 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { config } from "../config";
+import { DomainError } from "./exams";
 
 /**
  * Private object storage. Production: Supabase Storage (private buckets, signed URLs).
@@ -18,6 +19,7 @@ function safePath(p: string) {
 }
 
 export async function supabaseAdmin() {
+  if (!config.supabase.serviceKey) throw new DomainError("File storage is not configured on this server (SUPABASE_SERVICE_ROLE_KEY is missing).", 503);
   const { createClient } = await import("@supabase/supabase-js");
   return createClient(config.supabase.url!, config.supabase.serviceKey!, { auth: { persistSession: false } });
 }

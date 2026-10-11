@@ -19,7 +19,9 @@ const supabaseAnonKey = env("NEXT_PUBLIC_SUPABASE_ANON_KEY");
 const supabaseServiceKey = env("SUPABASE_SERVICE_ROLE_KEY");
 const databaseUrl = env("DATABASE_URL");
 
-const supabaseConfigured = !!(supabaseUrl && supabaseAnonKey && supabaseServiceKey && databaseUrl);
+// The service role key is only needed for Storage and deleting Auth users; without it those
+// features return a clear "not configured" error instead of falling back to development mode.
+const supabaseConfigured = !!(supabaseUrl && supabaseAnonKey && databaseUrl);
 
 export const config = {
   appUrl: env("NEXT_PUBLIC_APP_URL") ?? "http://localhost:3000",
@@ -67,7 +69,7 @@ export const config = {
 export function assertProductionReady() {
   if (!config.isProduction) return;
   const missing: string[] = [];
-  if (config.backend !== "supabase") missing.push("Supabase (NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, DATABASE_URL)");
+  if (config.backend !== "supabase" || !config.supabase.serviceKey) missing.push("Supabase (NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, DATABASE_URL)");
   if (!config.stripe.configured) missing.push("Stripe (STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET)");
   if (missing.length) throw new Error(`APP_ENV=production but these services are not configured: ${missing.join("; ")}`);
 }
@@ -79,7 +81,7 @@ export function serviceStatuses(): ServiceStatus[] {
     {
       name: "Database & auth",
       mode: config.backend === "supabase" ? "live" : "development",
-      detail: config.backend === "supabase" ? "Supabase Postgres, Auth and Storage" : "Embedded Postgres (PGlite), local file storage, development cookie login",
+      detail: config.backend === "supabase" ? (config.supabase.serviceKey ? "Supabase Postgres, Auth and Storage" : "Supabase Postgres and Auth. Storage is off until SUPABASE_SERVICE_ROLE_KEY is set (speaking recordings and audio uploads fail)") : "Embedded Postgres (PGlite), local file storage, development cookie login",
     },
     {
       name: "Payments",

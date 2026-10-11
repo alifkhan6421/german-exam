@@ -27,10 +27,11 @@ const TRACK_TITLES: Record<string, string> = {
 
 /**
  * Idempotent reference data: blueprints, tracks, plans and the 40 mock exam slots.
- * With `dev: true` it also creates development users and publishes Goethe A1 Mock 1
+ * With `dev: true` it also creates development users. `dev` or `demo` (test deployments, never
+ * APP_ENV=production) publish Goethe A1 Mock 1
  * (development preview audio, blueprint confirmed by the seed and labelled as such).
  */
-export async function seed(db: Db, opts: { dev: boolean }) {
+export async function seed(db: Db, opts: { dev: boolean; demo?: boolean }) {
   for (const bp of BLUEPRINTS) {
     await db.query(
       `insert into blueprint_versions (blueprint_key, version, definition) values ($1, $2, $3::jsonb)
@@ -81,7 +82,7 @@ export async function seed(db: Db, opts: { dev: boolean }) {
     }
   }
 
-  if (!opts.dev) {
+  if (!opts.dev && !opts.demo) {
     // Production: import the authored Goethe A1 Mock 1 as an unpublished v1 draft only.
     // It still needs approved studio audio, blueprint confirmation and human review before publishing.
     const exam = await db.one<{ id: string; current_version_id: string | null }>(
@@ -104,8 +105,8 @@ export async function seed(db: Db, opts: { dev: boolean }) {
     return;
   }
 
-  const ids: Record<string, string> = {};
-  for (const u of DEV_USERS) {
+  const ids: Record<string, string | null> = { "admin@example.com": null };
+  for (const u of opts.dev ? DEV_USERS : []) {
     const existing = await db.one<{ id: string }>(`select id from profiles where email = $1`, [u.email]);
     const id = existing?.id ?? randomUUID();
     ids[u.email] = id;
@@ -120,7 +121,7 @@ export async function seed(db: Db, opts: { dev: boolean }) {
   if (!confirmed) {
     await db.query(
       `insert into blueprint_confirmations (blueprint_key, version, confirmed_by, note) values ($1, $2, $3, $4)`,
-      [bp.key, bp.version, ids["admin@example.com"], "DEVELOPMENT SEED: auto-confirmed so the demo exam can be published. An administrator must review the unverified Hören item split before production."],
+      [bp.key, bp.version, ids["admin@example.com"], `${opts.dev ? "DEVELOPMENT" : "TEST DEPLOYMENT"} SEED: auto-confirmed so the demo exam can be published. An administrator must review the unverified Hören item split before production.`],
     );
   }
 

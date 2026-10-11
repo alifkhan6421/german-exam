@@ -118,7 +118,11 @@ export function getDb(): Promise<Db> {
   if (!g.__db) {
     g.__db = (async () => {
       assertProductionReady();
-      if (config.backend === "supabase") return createPg(config.supabase.databaseUrl!);
+      if (config.backend === "supabase") {
+        const db = await createPg(config.supabase.databaseUrl!);
+        await seedOnStart(db);
+        return db;
+      }
       const db = await createPglite(path.join(config.dev.dataDir, "pglite"));
       await migrate(db, { includeDev: true });
       const { seed } = await import("./seed");
@@ -132,12 +136,30 @@ export function getDb(): Promise<Db> {
   return g.__db;
 }
 
+/**
+ * Hosted deployments where nobody can run `npm run db:migrate` (no direct database access):
+ * SEED_ON_START=reference applies the production seed once per blueprint/content revision;
+ * SEED_ON_START=demo (refused when APP_ENV=production) also publishes the demo exam.
+ * Schema migrations are still applied separately.
+ */
+async function seedOnStart(db: Db) {
+  const mode = process.env.SEED_ON_START;
+  if (mode !== "reference" && mode !== "demo") return;
+  if (mode === "demo" && config.isProduction) throw new Error("SEED_ON_START=demo is not allowed with APP_ENV=production");
+  const { seed } = await import("./seed");
+  const { BLUEPRINTS } = await import("@/domain/blueprints");
+  const marker = `seed/${mode}/${BLUEPRINTS.map((b) => `${b.key}@${b.version}`).join(",")}`;
+  if (await db.one(`select 1 from _migrations where name = $1`, [marker])) return;
+  await seed(db, { dev: false, demo: mode === "demo" });
+  await db.query(`insert into _migrations (name) values ($1) on conflict do nothing`, [marker]);
+}
+
 /** Fresh in-memory database for tests. */
-export async function createTestDb(opts: { devSeed?: boolean } = {}): Promise<Db> {
+export async function createTestDb(opts: { devSeed?: boolean; demo?: boolean } = {}): Promise<Db> {
   const db = await createPglite("memory://");
   await migrate(db, { includeDev: true });
   const { seed } = await import("./seed");
-  await seed(db, { dev: opts.devSeed ?? true });
+  await seed(db, { dev: opts.devSeed ?? true, demo: opts.demo });
   return db;
 }
 
