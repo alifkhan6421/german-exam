@@ -98,7 +98,8 @@ export function Recorder({
     if (!stream) return;
     chunks.current = [];
     const mime = ["audio/webm;codecs=opus", "audio/webm", "audio/ogg", "audio/mp4"].find((m) => MediaRecorder.isTypeSupported(m)) ?? "";
-    const rec = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined);
+    // ~48 kbit/s keeps even long answers well under serverless upload limits (about 6 KB per second).
+    const rec = new MediaRecorder(stream, { ...(mime ? { mimeType: mime } : {}), audioBitsPerSecond: 48_000 });
     recRef.current = rec;
     rec.ondataavailable = (e) => e.data.size && chunks.current.push(e.data);
     rec.onstop = upload;

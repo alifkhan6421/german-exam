@@ -63,7 +63,7 @@ create policy "own usage" on usage_counters for select using (auth.uid() = user_
 create policy "own consents" on consents for select using (auth.uid() = user_id);
 
 -- Private buckets: exam media (approved audio, images) and student submissions.
-insert into storage.buckets (id, name, public) values ('exam-media', 'exam-media', false) on conflict (id) do nothing;
-insert into storage.buckets (id, name, public) values ('submissions', 'submissions', false) on conflict (id) do nothing;
+insert into storage.buckets (id, name, public, file_size_limit) values ('exam-media', 'exam-media', false, 26214400) on conflict (id) do nothing;
+insert into storage.buckets (id, name, public, file_size_limit) values ('submissions', 'submissions', false, 15728640) on conflict (id) do nothing;
 -- No storage.objects policies are created: all access is via short-lived signed URLs
 -- issued by the server after an authorisation check.

@@ -33,6 +33,7 @@ export async function registerAction(_: FormState, form: FormData): Promise<Form
   if (!parsed.success) return { error: "Please check your details." };
   const res = await signUp({ ...parsed.data, acceptTerms: parsed.data.acceptTerms === "on" });
   if (!res.ok) return { error: res.error };
+  if (res.confirmEmail) return { ok: true, message: "Check your inbox and click the confirmation link to finish creating your account." };
   redirect("/onboarding");
 }
 

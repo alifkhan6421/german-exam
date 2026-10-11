@@ -124,16 +124,36 @@ export function StudioMixer({ versionId, scriptId, turns, ambienceUrl, environme
     setBusy("upload");
     setError(null);
     try {
-      const form = new FormData();
-      form.set("file", blob, provider === "upload" ? "upload" : "mix.wav");
-      form.set("versionId", versionId);
-      form.set("scriptId", scriptId);
-      form.set("durationSec", String(seconds));
-      form.set("provider", provider);
-      form.set("production", JSON.stringify({ ...environment, ambienceGain: Math.min(MAX_AMBIENCE_GAIN, ambience * 0.5), turns: turns.length, mixedAt: new Date().toISOString() }));
-      const res = await fetch("/api/admin/audio/final", { method: "POST", body: form });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Upload failed");
+      const mime = blob.type || "audio/wav";
+      const meta = {
+        versionId,
+        scriptId,
+        mime,
+        durationSec: seconds,
+        provider,
+        production: { ...environment, ambienceGain: Math.min(MAX_AMBIENCE_GAIN, ambience * 0.5), turns: turns.length, mixedAt: new Date().toISOString() },
+      };
+      const post = async (body: BodyInit, json: boolean) => {
+        const res = await fetch("/api/admin/audio/final", { method: "POST", body, headers: json ? { "content-type": "application/json" } : undefined });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error ?? "Upload failed");
+        return data;
+      };
+      const prep = await post(JSON.stringify({ step: "prepare", versionId, scriptId, mime, bytes: blob.size }), true);
+      if (prep.direct) {
+        // Development storage: send the file through the app server.
+        const form = new FormData();
+        form.set("file", blob, provider === "upload" ? "upload" : "mix.wav");
+        for (const [k, v] of Object.entries(meta)) form.set(k, typeof v === "object" ? JSON.stringify(v) : String(v));
+        await post(form, false);
+      } else {
+        // Supabase: upload straight to private storage with the one-time token, then record it.
+        const { createClient } = await import("@supabase/supabase-js");
+        const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, { auth: { persistSession: false } });
+        const { error } = await sb.storage.from("exam-media").uploadToSignedUrl(prep.path, prep.token, blob, { contentType: mime });
+        if (error) throw new Error(`Upload to storage failed: ${error.message}`);
+        await post(JSON.stringify({ step: "complete", assetId: prep.assetId, ...meta }), true);
+      }
       router.refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Upload failed");

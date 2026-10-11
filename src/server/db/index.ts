@@ -1,7 +1,7 @@
 import "server-only";
 import fs from "node:fs";
 import path from "node:path";
-import { config } from "../config";
+import { assertProductionReady, config } from "../config";
 
 /**
  * Minimal database interface shared by the embedded development database (PGlite) and
@@ -117,6 +117,7 @@ const g = globalThis as unknown as { __db?: Promise<Db> };
 export function getDb(): Promise<Db> {
   if (!g.__db) {
     g.__db = (async () => {
+      assertProductionReady();
       if (config.backend === "supabase") return createPg(config.supabase.databaseUrl!);
       const db = await createPglite(path.join(config.dev.dataDir, "pglite"));
       await migrate(db, { includeDev: true });

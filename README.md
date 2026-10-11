@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Prüfungsklar: German exam preparation
 
-## Getting Started
+Mock exams and practice for Goethe-Zertifikat and telc German exams, levels A1 to B2.
+The app is independent: it is not affiliated with, endorsed by or connected to the Goethe-Institut
+or telc gGmbH. All exam content is original.
 
-First, run the development server:
+Stack: Next.js 15 (App Router) · TypeScript · Tailwind CSS v4 · Supabase (Postgres, Auth, Storage) ·
+Stripe Billing · ElevenLabs · Anthropic Claude · Vercel.
+
+## Quick start (development mode, no accounts needed)
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev            # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Without credentials the app runs fully in **development mode**. It uses an embedded Postgres (PGlite)
+in `.data/`, cookie login, simulated checkout and browser speech for listening previews.
+Every simulated service is labelled in the UI and listed in [docs/DEV_MODE.md](docs/DEV_MODE.md).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Development accounts, created on first start:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Role | Email | Password |
+|---|---|---|
+| Super Admin | admin@example.com | admin-dev-123 |
+| Content Admin | editor@example.com | editor-dev-123 |
+| Examiner | examiner@example.com | examiner-dev-123 |
+| Student | student@example.com | student-dev-123 |
 
-## Learn More
+These accounts exist only in the embedded development database. Production never creates them.
 
-To learn more about Next.js, take a look at the following resources:
+## Commands
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Command | What it does |
+|---|---|
+| `npm run dev` | Development server |
+| `npm run build` / `npm start` | Production build and server |
+| `npm run typecheck` | TypeScript |
+| `npm run lint` | ESLint |
+| `npm test` | Unit and integration tests (Vitest, in-memory Postgres) |
+| `npm run test:e2e` | Browser tests (Playwright). In this sandbox set `PLAYWRIGHT_CHROMIUM_PATH=/opt/pw-browsers/chromium` |
+| `npm run db:migrate` | Apply migrations and reference data to `DATABASE_URL` (production) |
+| `npx tsx scripts/blueprint-report.ts` | List every exam rule that still needs administrator confirmation |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Documentation
 
-## Deploy on Vercel
+- [Architecture](docs/ARCHITECTURE.md): data model, exam lifecycle, scoring, security boundaries and route map.
+- [Development mode](docs/DEV_MODE.md): what is simulated and how it is labelled.
+- [Exam blueprints](docs/BLUEPRINTS.md): which official exam facts are verified and which need confirmation.
+- [Deployment](docs/DEPLOYMENT.md): Vercel, Supabase, Stripe, ElevenLabs, Anthropic and cron setup.
+- [Launch checklist](docs/LAUNCH_CHECKLIST.md): what has to happen before real students pay.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Current content status
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Out of 40 planned mock exams (8 tracks × 5), **one is authored**: Goethe A1 Start Deutsch 1, Übungstest 1.
+In development it is published with labelled browser-speech audio. In production it is imported as an
+**unpublished draft**: it needs studio audio from the Audio Studio, blueprint confirmation and human
+review before it can be published. The other 39 slots are empty drafts, to be produced with the
+AI generator plus human review, or written by hand in the exam editor.

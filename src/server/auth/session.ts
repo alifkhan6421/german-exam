@@ -61,7 +61,7 @@ export async function loadProfile(id: string): Promise<CurrentUser | null> {
   return r ? toUser(r) : null;
 }
 
-async function supabaseServer() {
+export async function supabaseServer() {
   const { createServerClient } = await import("@supabase/ssr");
   const store = await cookies();
   return createServerClient(config.supabase.url!, config.supabase.anonKey!, {
@@ -113,7 +113,7 @@ export async function apiUser(permission?: Permission): Promise<CurrentUser | nu
   return u;
 }
 
-export type AuthResult = { ok: true } | { ok: false; error: string };
+export type AuthResult = { ok: true; confirmEmail?: boolean } | { ok: false; error: string };
 
 export async function signIn(email: string, password: string): Promise<AuthResult> {
   email = email.trim().toLowerCase();
@@ -146,13 +146,18 @@ export async function signUp(input: { email: string; password: string; displayNa
   if (input.password.length < 10) return { ok: false, error: "Use at least 10 characters for your password." };
   if (config.backend === "supabase") {
     const sb = await supabaseServer();
-    const { data, error } = await sb.auth.signUp({ email, password: input.password, options: { data: { display_name: input.displayName } } });
+    const { data, error } = await sb.auth.signUp({
+      email,
+      password: input.password,
+      options: { data: { display_name: input.displayName }, emailRedirectTo: `${config.appUrl}/auth/callback?next=/onboarding` },
+    });
     if (error) return { ok: false, error: error.message };
     if (data.user) {
       const db = await getDb();
       await db.query(`insert into consents (user_id, kind, granted) values ($1, 'terms', true), ($1, 'privacy', true)`, [data.user.id]);
     }
-    return { ok: true };
+    // With email confirmation enabled in Supabase Auth there is no session until the link is clicked.
+    return { ok: true, confirmEmail: !data.session };
   }
   const db = await getDb();
   const exists = await db.one(`select 1 from profiles where email = $1`, [email]);

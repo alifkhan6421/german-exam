@@ -6,7 +6,7 @@ import { config } from "../config";
 import type { Db } from "../db";
 import { audit } from "./audit";
 import { createDraftVersion, DomainError, getVersion, saveDraftContent } from "./exams";
-import { putObject, signedUrl } from "./storage";
+import { putObject, signedUrl, supabaseAdmin } from "./storage";
 
 /**
  * Listening audio production.
@@ -156,18 +156,16 @@ export function defaultAmbiencePrompt(script: ListeningScript) {
 
 const MAX_FINAL_BYTES = 25 * 1024 * 1024;
 
-export async function uploadFinal(
-  db: Db,
-  actor: CurrentUser,
-  args: { versionId: string; scriptId: string; data: Buffer; mime: string; durationSec: number; production: Record<string, unknown>; provider: "studio_mix" | "upload" },
-) {
-  await loadScript(db, args.versionId, args.scriptId);
-  if (args.data.length > MAX_FINAL_BYTES) throw new DomainError("Audio file is too large.", 413);
-  if (!/^audio\/(wav|x-wav|mpeg|mp4|ogg|webm|aac)/.test(args.mime)) throw new DomainError("Unsupported audio format.", 415);
-  const ext = args.mime.includes("wav") ? "wav" : args.mime.includes("mpeg") ? "mp3" : args.mime.includes("ogg") ? "ogg" : args.mime.includes("webm") ? "webm" : "m4a";
-  const id = randomUUID();
-  const path = `exams/${args.versionId}/${args.scriptId}/final-${id}.${ext}`;
-  await putObject("exam-media", path, args.data, args.mime);
+const FINAL_MIME = /^audio\/(wav|x-wav|mpeg|mp4|ogg|webm|aac)/;
+
+function finalPath(versionId: string, scriptId: string, assetId: string, mime: string) {
+  const ext = mime.includes("wav") ? "wav" : mime.includes("mpeg") ? "mp3" : mime.includes("ogg") ? "ogg" : mime.includes("webm") ? "webm" : "m4a";
+  return `exams/${versionId}/${scriptId}/final-${assetId}.${ext}`;
+}
+
+type FinalMeta = { versionId: string; scriptId: string; mime: string; durationSec: number; production: Record<string, unknown>; provider: "studio_mix" | "upload" };
+
+async function recordFinal(db: Db, actor: CurrentUser, id: string, path: string, args: FinalMeta) {
   await db.query(
     `insert into audio_assets (id, exam_version_id, script_id, kind, storage_path, mime, duration_sec, provider, production, created_by)
      values ($1, $2, $3, 'final', $4, $5, $6, $7, $8::jsonb, $9)`,
@@ -175,6 +173,52 @@ export async function uploadFinal(
   );
   await audit(db, { actorId: actor.id, action: "audio.final_uploaded", entityType: "exam_version", entityId: args.versionId, details: { scriptId: args.scriptId, assetId: id } });
   return id;
+}
+
+/** Upload through the app server (development storage). */
+export async function uploadFinal(db: Db, actor: CurrentUser, args: FinalMeta & { data: Buffer }) {
+  await loadScript(db, args.versionId, args.scriptId);
+  if (args.data.length > MAX_FINAL_BYTES) throw new DomainError("Audio file is too large.", 413);
+  if (!FINAL_MIME.test(args.mime)) throw new DomainError("Unsupported audio format.", 415);
+  const id = randomUUID();
+  const path = finalPath(args.versionId, args.scriptId, id, args.mime);
+  await putObject("exam-media", path, args.data, args.mime);
+  return recordFinal(db, actor, id, path, args);
+}
+
+/**
+ * Supabase: the browser uploads the file straight to private storage with a one-time signed
+ * upload token, because serverless request bodies are limited to a few MB.
+ * Returns null when storage is local (development), in which case uploadFinal is used.
+ */
+export async function prepareFinalUpload(db: Db, args: { versionId: string; scriptId: string; mime: string; bytes: number }) {
+  if (config.backend !== "supabase") return null;
+  await loadScript(db, args.versionId, args.scriptId);
+  if (!(args.bytes > 0) || args.bytes > MAX_FINAL_BYTES) throw new DomainError("Audio file is too large.", 413);
+  if (!FINAL_MIME.test(args.mime)) throw new DomainError("Unsupported audio format.", 415);
+  const assetId = randomUUID();
+  const path = finalPath(args.versionId, args.scriptId, assetId, args.mime);
+  const sb = await supabaseAdmin();
+  const { data, error } = await sb.storage.from("exam-media").createSignedUploadUrl(path);
+  if (error || !data) throw new DomainError("Could not prepare the upload.", 502);
+  return { assetId, path: data.path, token: data.token };
+}
+
+/** Record a file the browser uploaded with prepareFinalUpload, after checking it really exists. */
+export async function completeFinalUpload(db: Db, actor: CurrentUser, args: FinalMeta & { assetId: string }) {
+  if (config.backend !== "supabase") throw new DomainError("Direct uploads need Supabase storage.", 400);
+  if (!/^[0-9a-f-]{36}$/i.test(args.assetId)) throw new DomainError("Invalid asset id.");
+  await loadScript(db, args.versionId, args.scriptId);
+  if (await db.one(`select 1 from audio_assets where id = $1`, [args.assetId])) throw new DomainError("Upload already recorded.", 409);
+  const path = finalPath(args.versionId, args.scriptId, args.assetId, args.mime);
+  const sb = await supabaseAdmin();
+  const { data, error } = await sb.storage.from("exam-media").info(path);
+  if (error || !data) throw new DomainError("The uploaded file was not found.", 400);
+  if ((data.size ?? 0) > MAX_FINAL_BYTES) {
+    await sb.storage.from("exam-media").remove([path]);
+    throw new DomainError("Audio file is too large.", 413);
+  }
+  return recordFinal(db, actor, args.assetId, path, args);
 }
 
 /** Approve a final mix and link it to the script. Returns the version id that now holds it. */

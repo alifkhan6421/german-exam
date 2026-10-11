@@ -34,6 +34,7 @@ export function RegisterForm() {
   return (
     <form action={action} className="flex flex-col gap-4">
       {state?.error && <Alert tone="danger">{state.error}</Alert>}
+      {state?.message && <Alert tone="success">{state.message}</Alert>}
       <Field label="Name" htmlFor="displayName"><Input id="displayName" name="displayName" autoComplete="name" /></Field>
       <Field label="Email" htmlFor="email"><Input id="email" name="email" type="email" autoComplete="email" required /></Field>
       <Field label="Password" htmlFor="password" hint="At least 10 characters."><Input id="password" name="password" type="password" autoComplete="new-password" minLength={10} required /></Field>
