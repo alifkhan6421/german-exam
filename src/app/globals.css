@@ -1,26 +1,105 @@
 @import "tailwindcss";
 
+/*
+ * Design tokens. Calm, high-contrast palette for long reading sessions:
+ * ink navy for text, a deep "Rhein" blue as primary, warm paper surfaces for exam papers.
+ * Provider accents are deliberately neutral (not official brand colours).
+ */
+@theme {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  --color-ink-50: #f5f7fa;
+  --color-ink-100: #e9edf3;
+  --color-ink-200: #d3dae5;
+  --color-ink-300: #aab6c8;
+  --color-ink-400: #7889a3;
+  --color-ink-500: #55657f;
+  --color-ink-600: #3e4c63;
+  --color-ink-700: #2c384c;
+  --color-ink-800: #1c2637;
+  --color-ink-900: #0f1726;
+
+  --color-brand-50: #eef4ff;
+  --color-brand-100: #dbe6fe;
+  --color-brand-200: #bfd3fe;
+  --color-brand-500: #3b6fe0;
+  --color-brand-600: #2557c9;
+  --color-brand-700: #1d45a3;
+  --color-brand-800: #1b3a82;
+
+  --color-paper: #fdfcf8;
+  --color-paper-line: #ece8dc;
+
+  --color-goethe-50: #ecfdf6;
+  --color-goethe-600: #0d7f62;
+  --color-goethe-700: #0a6650;
+  --color-telc-50: #f3f1ff;
+  --color-telc-600: #5b47c7;
+  --color-telc-700: #4836a6;
+
+  --color-success-50: #ecfdf3;
+  --color-success-600: #15803d;
+  --color-warning-50: #fffbeb;
+  --color-warning-600: #b45309;
+  --color-danger-50: #fef2f2;
+  --color-danger-600: #c62828;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html,
+body {
+  background: var(--color-ink-50);
+  color: var(--color-ink-900);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Focus visibility for keyboard users everywhere. */
+:focus-visible {
+  outline: 2px solid var(--color-brand-500);
+  outline-offset: 2px;
+}
+
+/* Exam paper typography */
+.paper {
+  background: var(--color-paper);
+}
+.paper-text p {
+  margin: 0 0 0.6rem;
+  line-height: 1.6;
+}
+.paper-text table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 0.25rem 0 0.75rem;
+}
+.paper-text td,
+.paper-text th {
+  border: 1px solid var(--color-paper-line);
+  padding: 0.35rem 0.6rem;
+  text-align: left;
+  vertical-align: top;
+}
+.paper-text th {
+  background: #f6f3ea;
+  font-weight: 600;
+}
+.paper-text ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+  margin: 0 0 0.6rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
 }

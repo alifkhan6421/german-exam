@@ -149,6 +149,8 @@ create table if not exists attempts (
   state jsonb not null,
   status text not null default 'in_progress' check (status in ('in_progress', 'submitted')),
   play_counts jsonb not null default '{}'::jsonb,
+  -- Practice mode: items whose solution was revealed; they can no longer be changed.
+  checked_items text[] not null default '{}',
   result jsonb,
   scoring_version text,
   started_at timestamptz not null default now(),

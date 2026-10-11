@@ -18,7 +18,7 @@ import {
 import { canAccessExam } from "@/domain/entitlements";
 import { toPublicContent, type PublicExamContent } from "@/domain/exam/public";
 import { AnswerValueSchema, ExamContentSchema, allItems, findItem, type AnswerValue, type ExamContent } from "@/domain/exam/schema";
-import { scoreAttempt, type AssessmentInput, type ResultSummary } from "@/domain/scoring/score";
+import { isCorrect, scoreAttempt, type AssessmentInput, type ResultSummary } from "@/domain/scoring/score";
 import { config } from "../config";
 import type { Db } from "../db";
 import type { CurrentUser } from "../auth/session";
@@ -38,6 +38,7 @@ export interface AttemptRow {
   state: AttemptState;
   status: "in_progress" | "submitted";
   play_counts: Record<string, number>;
+  checked_items: string[];
   result: ResultSummary | null;
   scoring_version: string | null;
   started_at: string;
@@ -168,6 +169,7 @@ export interface AttemptView {
   content: PublicExamContent;
   answers: Record<string, AnswerValue>;
   playCounts: Record<string, number>;
+  checkedItems: string[];
   devPreviewAudio: boolean;
 }
 
@@ -198,6 +200,7 @@ export async function getAttemptView(db: Db, userId: string, attemptId: string, 
     content: toPublicContent(scoped, { includeTranscripts: false }),
     answers,
     playCounts: row.play_counts ?? {},
+    checkedItems: row.checked_items ?? [],
     devPreviewAudio,
   };
 }
@@ -224,6 +227,7 @@ export async function saveAnswer(db: Db, userId: string, attemptId: string, item
   if (!found || !row.section_ids.includes(found.section.sectionId)) throw new DomainError("Unknown question.", 404);
   const gate = canAnswer(row.state, found.section.sectionId, now);
   if (!gate.ok) throw new DomainError(gate.reason!, 409);
+  if (row.checked_items?.includes(itemId)) throw new DomainError("You already checked this answer.", 409);
   const parsed = AnswerValueSchema.safeParse(rawValue);
   if (!parsed.success) throw new DomainError("Invalid answer.");
   const value = parsed.data;
@@ -247,6 +251,30 @@ export async function saveAnswer(db: Db, userId: string, attemptId: string, item
   return { savedAt: now.toISOString() };
 }
 
+/** Practice mode only: reveal whether a saved objective answer is correct, then lock it. */
+export async function checkAnswer(db: Db, user: CurrentUser, attemptId: string, itemId: string, now = new Date()) {
+  let row = await loadRow(db, attemptId, user.id);
+  if (row.mode !== "practice") throw new DomainError("Answers are not revealed in exam mode.", 403);
+  row = await reconcileAndPersist(db, row, now);
+  const { content } = await versionFor(db, row);
+  const found = findItem(content, itemId);
+  if (!found || !row.section_ids.includes(found.section.sectionId)) throw new DomainError("Unknown question.", 404);
+  if (!["mc", "true_false", "ab", "matching", "gap_select", "short_text"].includes(found.item.type)) throw new DomainError("Only objective questions can be checked.");
+  const answers = await loadAnswers(db, row.id);
+  if (!answers[itemId]) throw new DomainError("Answer the question first.");
+  const key = content.answerKey[itemId];
+  const ent = await getEntitlements(db, user.id);
+  await db.query(`update attempts set checked_items = array_append(checked_items, $1) where id = $2 and not ($1 = any(checked_items))`, [itemId, row.id]);
+  await event(db, row.id, "checked", { itemId });
+  return {
+    correct: isCorrect(found.item, answers[itemId], key?.correct ?? []),
+    correctAnswers: key?.correct ?? [],
+    explanation: ent.explanations ? key?.explanation ?? null : null,
+    evidence: ent.explanations ? key?.evidence ?? null : null,
+    explanationsLocked: !ent.explanations,
+  };
+}
+
 export async function clearAnswer(db: Db, userId: string, attemptId: string, itemId: string, now = new Date()) {
   let row = await loadRow(db, attemptId, userId);
   row = await reconcileAndPersist(db, row, now);
@@ -255,6 +283,7 @@ export async function clearAnswer(db: Db, userId: string, attemptId: string, ite
   if (!found) throw new DomainError("Unknown question.", 404);
   const gate = canAnswer(row.state, found.section.sectionId, now);
   if (!gate.ok) throw new DomainError(gate.reason!, 409);
+  if (row.checked_items?.includes(itemId)) throw new DomainError("You already checked this answer.", 409);
   await db.query(`delete from attempt_answers where attempt_id = $1 and item_id = $2`, [row.id, itemId]);
 }
 
