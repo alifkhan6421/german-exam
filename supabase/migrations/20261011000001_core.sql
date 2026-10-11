@@ -50,7 +50,7 @@ create table if not exists blueprint_confirmations (
   id uuid primary key default gen_random_uuid(),
   blueprint_key text not null,
   version text not null,
-  confirmed_by uuid references profiles(id),
+  confirmed_by uuid references profiles(id) on delete set null,
   note text not null,
   created_at timestamptz not null default now(),
   foreign key (blueprint_key, version) references blueprint_versions(blueprint_key, version)
@@ -69,7 +69,7 @@ create table if not exists exams (
     check (status in ('draft', 'generated', 'validated', 'in_review', 'approved', 'published', 'archived')),
   current_version_id uuid,
   published_version_id uuid,
-  created_by uuid references profiles(id),
+  created_by uuid references profiles(id) on delete set null,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   unique (track_key, mock_number)
@@ -87,10 +87,10 @@ create table if not exists exam_versions (
   validation jsonb,
   -- Content is frozen once a version is in review; edits create a new version.
   locked boolean not null default false,
-  created_by uuid references profiles(id),
+  created_by uuid references profiles(id) on delete set null,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
-  approved_by uuid references profiles(id),
+  approved_by uuid references profiles(id) on delete set null,
   approved_at timestamptz,
   published_at timestamptz,
   unique (exam_id, version),
@@ -107,7 +107,7 @@ create index if not exists exam_versions_exam_idx on exam_versions(exam_id);
 create table if not exists review_decisions (
   id uuid primary key default gen_random_uuid(),
   exam_version_id uuid not null references exam_versions(id) on delete cascade,
-  reviewer_id uuid references profiles(id),
+  reviewer_id uuid references profiles(id) on delete set null,
   decision text not null check (decision in ('approve', 'request_changes', 'reject')),
   comments text,
   created_at timestamptz not null default now()
@@ -128,8 +128,8 @@ create table if not exists audio_assets (
   provider text not null check (provider in ('elevenlabs', 'upload', 'studio_mix')),
   status text not null default 'generated' check (status in ('generated', 'approved', 'rejected')),
   production jsonb not null default '{}'::jsonb,
-  created_by uuid references profiles(id),
-  approved_by uuid references profiles(id),
+  created_by uuid references profiles(id) on delete set null,
+  approved_by uuid references profiles(id) on delete set null,
   created_at timestamptz not null default now()
 );
 create index if not exists audio_assets_script_idx on audio_assets(exam_version_id, script_id);
@@ -202,7 +202,7 @@ create table if not exists assessments (
   total numeric not null,
   max numeric not null,
   feedback jsonb not null default '{}'::jsonb, -- annotations, suggestions, model answer
-  reviewer_id uuid references profiles(id),
+  reviewer_id uuid references profiles(id) on delete set null,
   created_at timestamptz not null default now()
 );
 create index if not exists assessments_attempt_idx on assessments(attempt_id);
@@ -298,7 +298,7 @@ create table if not exists generation_jobs (
   validation jsonb,
   error text,
   usage jsonb,
-  created_by uuid references profiles(id),
+  created_by uuid references profiles(id) on delete set null,
   created_at timestamptz not null default now(),
   finished_at timestamptz
 );

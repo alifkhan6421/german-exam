@@ -17,7 +17,7 @@ function safePath(p: string) {
   return norm;
 }
 
-async function supabaseAdmin() {
+export async function supabaseAdmin() {
   const { createClient } = await import("@supabase/supabase-js");
   return createClient(config.supabase.url!, config.supabase.serviceKey!, { auth: { persistSession: false } });
 }
