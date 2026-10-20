@@ -21,7 +21,7 @@ export const SKILL_LABELS: Record<Skill, string> = {
 /** Percentage per completed section, oldest first, for trend charts. */
 export function skillTimeline(attempts: AttemptForStats[]) {
   const points: { date: string; attemptId: string; skill: Skill; percent: number; provisional: boolean }[] = [];
-  for (const a of [...attempts].filter((x) => x.result).sort((x, y) => (x.submittedAt ?? x.startedAt).localeCompare(y.submittedAt ?? y.startedAt))) {
+  for (const a of [...attempts].filter((x) => x.result).sort((x, y) => Date.parse(x.submittedAt ?? x.startedAt) - Date.parse(y.submittedAt ?? y.startedAt))) {
     for (const s of a.result!.sections) {
       if (!s.attempted || !s.complete || s.scaledPoints === null || !s.scaledMax) continue;
       points.push({ date: a.submittedAt ?? a.startedAt, attemptId: a.id, skill: s.skill, percent: Math.round((s.scaledPoints / s.scaledMax) * 100), provisional: s.provisional });

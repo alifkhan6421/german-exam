@@ -22,7 +22,7 @@ export default async function ProgressPage() {
   const user = await requireUser();
   const db = await getDb();
   const [attempts, ent] = await Promise.all([listUserAttempts(db, user.id, 200), getEntitlements(db, user.id)]);
-  const stats: AttemptForStats[] = attempts.map((a) => ({ id: a.id, title: a.title, trackKey: a.track_key, startedAt: a.started_at, submittedAt: a.submitted_at, result: a.result }));
+  const stats: AttemptForStats[] = attempts.map((a) => ({ id: a.id, title: a.title, trackKey: a.track_key, startedAt: new Date(a.started_at).toISOString(), submittedAt: a.submitted_at ? new Date(a.submitted_at).toISOString() : null, result: a.result }));
   const skills = skillAverages(stats);
   const full = ent.progressAnalytics === "full";
   const parts = partAccuracy(stats).sort((a, b) => a.percent - b.percent);

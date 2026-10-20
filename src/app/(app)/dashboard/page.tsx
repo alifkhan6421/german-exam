@@ -29,7 +29,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
     getEntitlements(db, user.id),
     user.targetTrack ? getTrack(db, user.targetTrack) : Promise.resolve(undefined),
   ]);
-  const stats: AttemptForStats[] = attempts.map((a) => ({ id: a.id, title: a.title, trackKey: a.track_key, startedAt: a.started_at, submittedAt: a.submitted_at, result: a.result }));
+  const stats: AttemptForStats[] = attempts.map((a) => ({ id: a.id, title: a.title, trackKey: a.track_key, startedAt: new Date(a.started_at).toISOString(), submittedAt: a.submitted_at ? new Date(a.submitted_at).toISOString() : null, result: a.result }));
   const completed = attempts.filter((a) => a.status === "submitted");
   const avg = averageScore(stats);
   const skills = skillAverages(stats);
