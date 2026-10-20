@@ -4,6 +4,8 @@ const nextConfig: NextConfig = {
   // PGlite ships WASM and data files that must be loaded from node_modules at runtime.
   serverExternalPackages: ["@electric-sql/pglite", "pg"],
   poweredByHeader: false,
+  // Prepared listening mixes are read from disk by the admin importer.
+  outputFileTracingIncludes: { "/admin/**": ["./content/audio/**/*"] },
   async headers() {
     return [
       {

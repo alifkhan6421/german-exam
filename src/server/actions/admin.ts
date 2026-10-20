@@ -9,6 +9,7 @@ import { requirePermission, type CurrentUser } from "../auth/session";
 import { getDb, type Db } from "../db";
 import { audit } from "../services/audit";
 import { approveAudio, castVoices, generateAmbience, generateTurns, rejectAudio } from "../services/audio";
+import { importAudioBundle } from "../services/audio-bundle";
 import { submitHumanAssessment } from "../services/assessment";
 import {
   archiveExam, confirmBlueprint, createDraftVersion, DomainError, duplicateExam, publishVersion, reviewVersion, saveDraftContent,
@@ -177,6 +178,13 @@ export async function generateAmbienceAction(_: FormState, f: FormData): Promise
   return run("audio.produce", async (db, u) => {
     await generateAmbience(db, u, s(f, "versionId"), s(f, "scriptId"));
     return { ok: true, message: "Ambience generated." };
+  });
+}
+
+export async function importAudioBundleAction(_: FormState, f: FormData): Promise<FormState> {
+  return run("audio.produce", async (db, u) => {
+    const { imported, skipped } = await importAudioBundle(db, u, s(f, "bundle"));
+    return { ok: true, message: `Imported ${imported} recordings${skipped ? `, ${skipped} were already imported` : ""}. Open each script to listen and approve.` };
   });
 }
 

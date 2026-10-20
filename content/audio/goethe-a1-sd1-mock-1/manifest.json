@@ -1,0 +1,146 @@
+{
+  "trackKey": "goethe-a1-sd1",
+  "mockNumber": 1,
+  "tts": {
+    "provider": "elevenlabs",
+    "model": "eleven_multilingual_v2"
+  },
+  "mixer": "ffmpeg: 0.8 s lead-in, script pauses between turns, telephone band-pass / public-address echo where the script says so, loudnorm -18 LUFS, mp3 128k mono 44.1 kHz; no ambience",
+  "entries": [
+    {
+      "scriptId": "sc-h0",
+      "file": "sc-h0.mp3",
+      "durationSec": 14.9,
+      "voices": {
+        "w": "Leni (WzPl01KDMCPMOyx39EfF)",
+        "r": "Michael (A2eYGaZmwykOiEVBlQ7h)"
+      }
+    },
+    {
+      "scriptId": "sc-h1",
+      "file": "sc-h1.mp3",
+      "durationSec": 15.8,
+      "voices": {
+        "k": "Paula (wHR4cJTJPHxuaVKVowsw)",
+        "v": "Jan (ntwcx49ZcqEarZ2so6jP)"
+      }
+    },
+    {
+      "scriptId": "sc-h2",
+      "file": "sc-h2.mp3",
+      "durationSec": 16.2,
+      "voices": {
+        "m": "Nik (pjvu5b1KMIka2bL61Exv)",
+        "f": "Nadine (yMouMDT5kvrfmH76gqc1)"
+      }
+    },
+    {
+      "scriptId": "sc-h3",
+      "file": "sc-h3.mp3",
+      "durationSec": 21.1,
+      "voices": {
+        "p": "Silke (a9xTHeUqm2s31ct5pQck)",
+        "n": "Piet (2QhwfRSog8ArO9AfgYMU)"
+      }
+    },
+    {
+      "scriptId": "sc-h4",
+      "file": "sc-h4.mp3",
+      "durationSec": 12.7,
+      "voices": {
+        "k": "Pauli (S87WJpstXs0Ge2ukRiXJ)",
+        "g": "Jonathan (cBXK6zX7G4V4Z4L3Ufcn)"
+      }
+    },
+    {
+      "scriptId": "sc-h5",
+      "file": "sc-h5.mp3",
+      "durationSec": 14.7,
+      "voices": {
+        "j": "AndreasNat (xdDg9mM0tUltxOiJ0HCG)",
+        "l": "Leni (WzPl01KDMCPMOyx39EfF)"
+      }
+    },
+    {
+      "scriptId": "sc-h6",
+      "file": "sc-h6.mp3",
+      "durationSec": 12.3,
+      "voices": {
+        "k": "Nadine (yMouMDT5kvrfmH76gqc1)",
+        "v": "Michael (A2eYGaZmwykOiEVBlQ7h)"
+      }
+    },
+    {
+      "scriptId": "sc-h7",
+      "file": "sc-h7.mp3",
+      "durationSec": 13.5,
+      "voices": {
+        "d": "Emily (iEO9cGszaIjDeIaW2Ywk)"
+      }
+    },
+    {
+      "scriptId": "sc-h8",
+      "file": "sc-h8.mp3",
+      "durationSec": 10.3,
+      "voices": {
+        "d": "AndreasTel (KEV4NTyPbF02zaXMLk5D)"
+      }
+    },
+    {
+      "scriptId": "sc-h9",
+      "file": "sc-h9.mp3",
+      "durationSec": 14.0,
+      "voices": {
+        "d": "Emily (iEO9cGszaIjDeIaW2Ywk)"
+      }
+    },
+    {
+      "scriptId": "sc-h10",
+      "file": "sc-h10.mp3",
+      "durationSec": 7.6,
+      "voices": {
+        "d": "Jan (ntwcx49ZcqEarZ2so6jP)"
+      }
+    },
+    {
+      "scriptId": "sc-h11",
+      "file": "sc-h11.mp3",
+      "durationSec": 8.6,
+      "voices": {
+        "s": "Paula (wHR4cJTJPHxuaVKVowsw)"
+      }
+    },
+    {
+      "scriptId": "sc-h12",
+      "file": "sc-h12.mp3",
+      "durationSec": 15.8,
+      "voices": {
+        "p": "Michael (A2eYGaZmwykOiEVBlQ7h)"
+      }
+    },
+    {
+      "scriptId": "sc-h13",
+      "file": "sc-h13.mp3",
+      "durationSec": 12.7,
+      "voices": {
+        "k": "Silke (a9xTHeUqm2s31ct5pQck)"
+      }
+    },
+    {
+      "scriptId": "sc-h14",
+      "file": "sc-h14.mp3",
+      "durationSec": 15.0,
+      "voices": {
+        "f": "Piet (2QhwfRSog8ArO9AfgYMU)"
+      }
+    },
+    {
+      "scriptId": "sc-h15",
+      "file": "sc-h15.mp3",
+      "durationSec": 12.3,
+      "voices": {
+        "b": "Nik (pjvu5b1KMIka2bL61Exv)"
+      }
+    }
+  ]
+}

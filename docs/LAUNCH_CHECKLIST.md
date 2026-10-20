@@ -18,8 +18,10 @@ content items: nothing can be published while they are open.
       [BLUEPRINTS.md](BLUEPRINTS.md) against the official handbook or Modellsatz, correct anything wrong in
       `src/domain/blueprints/`, then confirm in **Admin → Blueprints**. telc A1, A2, B1 and B2 have
       **unverified pass rules**, so no pass estimate is shown for them until this is done.
-- [ ] **Goethe A1 Mock 1**: produce and approve studio audio for each listening script in **Admin → Audio**, run
-      validation, send it to review, approve it and publish it. It is already authored and imported as a draft.
+- [ ] **Goethe A1 Mock 1**: ElevenLabs recordings for all 16 listening scripts are committed in
+      `content/audio/goethe-a1-sd1-mock-1/`. In **Admin → Audio** click **Import recordings**, listen to and approve
+      each one (no background ambience was added), then run validation, send the draft to review, approve it and
+      publish it. Imported recordings stay unapproved until a reviewer approves them.
 - [ ] **The other 39 mock exams**: generate them with **Admin → AI generator** (or write them in the editor), then
       check each one for originality, level and answer-key correctness, produce audio, review and publish.
       Generated content is never published automatically.
