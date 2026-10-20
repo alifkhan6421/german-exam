@@ -4,6 +4,7 @@ import { ExamContentSchema } from "@/domain/exam/schema";
 import { validateExam } from "@/domain/exam/validate";
 import { EntitlementsSchema, FREE_ENTITLEMENTS } from "@/domain/entitlements";
 import { goetheA1Mock1 } from "@/content/goethe-a1/mock-1";
+import { TELC_A1_MOCKS } from "@/content/telc-a1";
 import { hashPassword } from "../auth/password";
 import type { Db } from "./index";
 
@@ -82,26 +83,14 @@ export async function seed(db: Db, opts: { dev: boolean; demo?: boolean }) {
     }
   }
 
+  // Authored telc A1 mocks are imported as unpublished v1 drafts in every mode. They still need
+  // audio, blueprint confirmation and human review before publishing.
+  for (const [i, mock] of TELC_A1_MOCKS.entries()) await importDraft(db, "telc-a1-sd1", i + 1, mock);
+
   if (!opts.dev && !opts.demo) {
     // Production: import the authored Goethe A1 Mock 1 as an unpublished v1 draft only.
     // It still needs approved studio audio, blueprint confirmation and human review before publishing.
-    const exam = await db.one<{ id: string; current_version_id: string | null }>(
-      `select id, current_version_id from exams where track_key = 'goethe-a1-sd1' and mock_number = 1`,
-    );
-    if (exam && !exam.current_version_id) {
-      const bp = getBlueprint("goethe-a1-sd1")!;
-      const content = ExamContentSchema.parse(goetheA1Mock1);
-      const report = validateExam(content, bp, { blueprintConfirmed: false, allowDevPreviewAudio: false });
-      const versionId = randomUUID();
-      await db.tx(async (tx) => {
-        await tx.query(
-          `insert into exam_versions (id, exam_id, version, blueprint_key, blueprint_version, content, status, validation, locked)
-           values ($1, $2, 1, $3, $4, $5::jsonb, 'draft', $6::jsonb, false)`,
-          [versionId, exam.id, bp.key, bp.version, JSON.stringify(content), JSON.stringify(report)],
-        );
-        await tx.query(`update exams set current_version_id = $1, updated_at = now() where id = $2`, [versionId, exam.id]);
-      });
-    }
+    await importDraft(db, "goethe-a1-sd1", 1, goetheA1Mock1);
     return;
   }
 
@@ -147,4 +136,25 @@ export async function seed(db: Db, opts: { dev: boolean; demo?: boolean }) {
       );
     });
   }
+}
+
+/** Import authored content as an unpublished v1 draft, unless the exam already has a version. */
+async function importDraft(db: Db, trackKey: string, mockNumber: number, input: unknown) {
+  const exam = await db.one<{ id: string; current_version_id: string | null }>(
+    `select id, current_version_id from exams where track_key = $1 and mock_number = $2`,
+    [trackKey, mockNumber],
+  );
+  if (!exam || exam.current_version_id) return;
+  const bp = getBlueprint(trackKey)!;
+  const content = ExamContentSchema.parse(input);
+  const report = validateExam(content, bp, { blueprintConfirmed: false, allowDevPreviewAudio: false });
+  const versionId = randomUUID();
+  await db.tx(async (tx) => {
+    await tx.query(
+      `insert into exam_versions (id, exam_id, version, blueprint_key, blueprint_version, content, status, validation, locked)
+       values ($1, $2, 1, $3, $4, $5::jsonb, 'draft', $6::jsonb, false)`,
+      [versionId, exam.id, bp.key, bp.version, JSON.stringify(content), JSON.stringify(report)],
+    );
+    await tx.query(`update exams set current_version_id = $1, updated_at = now() where id = $2`, [versionId, exam.id]);
+  });
 }

@@ -1,5 +1,5 @@
 import { proposedPart, proposedWriting, speakingSpec } from "./builders";
-import { sources, u, v, VERIFIED_AT } from "./facts";
+import { sources, TELC_A1_GRADE_BANDS, u, v, VERIFIED_AT } from "./facts";
 import type { Blueprint, BlueprintSection } from "./types";
 
 const PAGE_ONLY =
@@ -185,68 +185,152 @@ export const telcB1: Blueprint = {
 /* ------------------------------------------------------------------------------------------ */
 
 const PA1 = "telcA1Page";
+const UT = "telcA1Uebungstest1";
 
 export const telcA1: Blueprint = {
   key: "telc-a1-sd1",
-  version: "2026.10.1",
+  version: "2026.10.2",
   provider: "telc",
   level: "A1",
   officialName: "Start Deutsch 1 / telc Deutsch A1",
   variant: "Erwachsene",
-  verifiedAt: VERIFIED_AT,
-  sources: sources("telcA1Page"),
+  verifiedAt: "2026-10-20",
+  sources: sources("telcA1Page", "telcA1Uebungstest1"),
   moduleIndependence: v("Cannot be taken as a partial examination.", PA1),
   speakingFormat: v("Oral exam usually with 4 test takers, no preparation time.", PA1),
-  specialRules: [v("No break in the written exam.", PA1)],
+  specialRules: [
+    v("No break in the written exam.", PA1),
+    v("Hören Teil 1 and 2 and every Lesen part start with a worked example (Beispiel); Hören Teil 3 has none.", UT, "S. 8–19"),
+  ],
   timeGroups: [
     { id: "lesen-schreiben", sectionIds: ["lesen", "schreiben"], minutes: v(45, PA1, "Lesen und Schreiben 45 Minuten"), labelDe: "Lesen und Schreiben" },
   ],
   sections: [
     {
       id: "hoeren", skill: "listening", titleDe: "Hören", titleEn: "Listening", order: 1, component: "written",
-      durationMinutes: v(20, PA1, "ca. 20 Minuten"), rawMax: u(15, PAGE_ONLY), scaledMax: u(null, PAGE_ONLY),
+      durationMinutes: v(20, PA1, "ca. 20 Minuten"), rawMax: v(15, UT, "Testformat S. 5: Hören 15 Punkte"), scaledMax: v(15, UT, "Ergebnisblatt M10: Punkte /15, no conversion"),
       parts: [
-        proposedPart({ sectionId: "hoeren", number: 1, titleDe: "Hören Teil 1", descriptionEn: "Short everyday conversations; multiple choice.", instructionsDe: "Sie hören kurze Gespräche. Kreuzen Sie an: a, b oder c.", itemType: "mc", itemCount: 6, optionsPerItem: 3, playbacks: 2, textTypes: ["Alltagsgespräch"], note: PAGE_ONLY }),
-        proposedPart({ sectionId: "hoeren", number: 2, titleDe: "Hören Teil 2", descriptionEn: "Announcements; true/false.", instructionsDe: "Sie hören Durchsagen. Kreuzen Sie an: Richtig oder Falsch.", itemType: "true_false", itemCount: 4, playbacks: 1, textTypes: ["Durchsage"], note: PAGE_ONLY }),
-        proposedPart({ sectionId: "hoeren", number: 3, titleDe: "Hören Teil 3", descriptionEn: "Telephone messages; multiple choice.", instructionsDe: "Sie hören Ansagen am Telefon. Kreuzen Sie an: a, b oder c.", itemType: "mc", itemCount: 5, optionsPerItem: 3, playbacks: 2, textTypes: ["Telefonansage"], note: PAGE_ONLY }),
+        {
+          id: "hoeren-1", number: 1, titleDe: "Hören Teil 1",
+          descriptionEn: "Six short everyday conversations; three-option multiple choice, heard twice.",
+          instructionsDe: "Sie hören kurze Gespräche. Sie hören jeden Text zweimal. Kreuzen Sie an: a, b oder c.",
+          itemType: v("mc", UT, "S. 8–9: a, b oder c"), optionsPerItem: v(3, UT, "S. 8–9"),
+          itemCount: v(6, UT, "S. 8–9: Aufgaben 1–6"), pointsPerItem: v(1, UT, "Derived: 15 items, 15 points"),
+          textTypes: v(["Alltagsgespräch"], UT, "S. 8–9"), playbacks: v(2, UT, "S. 8: Sie hören jeden Text zweimal."),
+        },
+        {
+          id: "hoeren-2", number: 2, titleDe: "Hören Teil 2",
+          descriptionEn: "Four public announcements; true/false, heard once.",
+          instructionsDe: "Sie hören Durchsagen. Sie hören jeden Text einmal. Kreuzen Sie an: Richtig oder Falsch.",
+          itemType: v("true_false", UT, "S. 10: Richtig (+) oder falsch (–)"),
+          itemCount: v(4, UT, "S. 10: Aufgaben 7–10"), pointsPerItem: v(1, UT, "Derived: 15 items, 15 points"),
+          textTypes: v(["Durchsage"], UT, "S. 10"), playbacks: v(1, UT, "S. 10: Sie hören jeden Text einmal."),
+        },
+        {
+          id: "hoeren-3", number: 3, titleDe: "Hören Teil 3",
+          descriptionEn: "Five telephone messages; three-option multiple choice, heard twice, no example.",
+          instructionsDe: "Sie hören Ansagen am Telefon. Sie hören jeden Text zweimal. Kreuzen Sie an: a, b oder c.",
+          itemType: v("mc", UT, "S. 11: a, b oder c"), optionsPerItem: v(3, UT, "S. 11"),
+          itemCount: v(5, UT, "S. 11: Aufgaben 11–15"), pointsPerItem: v(1, UT, "Derived: 15 items, 15 points"),
+          textTypes: v(["Telefonansage"], UT, "S. 11"), playbacks: v(2, UT, "S. 11: Sie hören jeden Text zweimal."),
+        },
       ],
     },
     {
       id: "lesen", skill: "reading", titleDe: "Lesen", titleEn: "Reading", order: 2, component: "written",
-      durationMinutes: v(null, PA1, "Timed with Schreiben (45 min)"), timeGroupId: "lesen-schreiben", rawMax: u(15, PAGE_ONLY), scaledMax: u(null, PAGE_ONLY),
+      durationMinutes: v(25, UT, "S. 13: ca. 25 Minuten"), timeGroupId: "lesen-schreiben", rawMax: v(15, UT, "Ergebnisblatt M10: Punkte /15"), scaledMax: v(15, UT, "Ergebnisblatt M10: Punkte /15, no conversion"),
       parts: [
-        proposedPart({ sectionId: "lesen", number: 1, titleDe: "Lesen Teil 1", descriptionEn: "Short notes/e-mails; true/false.", instructionsDe: "Lesen Sie die Texte. Kreuzen Sie an: Richtig oder Falsch.", itemType: "true_false", itemCount: 5, textTypes: ["Notiz", "E-Mail"], note: PAGE_ONLY }),
-        proposedPart({ sectionId: "lesen", number: 2, titleDe: "Lesen Teil 2", descriptionEn: "Ads; choose a or b.", instructionsDe: "Lesen Sie die Texte. Wo finden Sie Informationen? Kreuzen Sie an: a oder b.", itemType: "ab", itemCount: 5, optionsPerItem: 2, textTypes: ["Anzeigen"], note: PAGE_ONLY }),
-        proposedPart({ sectionId: "lesen", number: 3, titleDe: "Lesen Teil 3", descriptionEn: "Signs/notices; true/false.", instructionsDe: "Lesen Sie die Texte. Kreuzen Sie an: Richtig oder Falsch.", itemType: "true_false", itemCount: 5, textTypes: ["Schild", "Aushang"], note: PAGE_ONLY }),
+        {
+          id: "lesen-1", number: 1, titleDe: "Lesen Teil 1",
+          descriptionEn: "Two short texts (note, invitation or e-mail); five true/false statements.",
+          instructionsDe: "Lesen Sie die zwei Texte. Sind die Aussagen 1–5 richtig oder falsch? Kreuzen Sie an.",
+          itemType: v("true_false", UT, "S. 14–15"), itemCount: v(5, UT, "S. 14–15: Aussagen 1–5"),
+          pointsPerItem: v(1, UT, "Derived: 15 items, 15 points"), textTypes: v(["Notiz", "Einladung", "E-Mail"], UT, "S. 14–15"),
+        },
+        {
+          id: "lesen-2", number: 2, titleDe: "Lesen Teil 2",
+          descriptionEn: "Five situations, each with two ads or web snippets; choose the useful one (a or b).",
+          instructionsDe: "Lesen Sie die Aufgaben 6–10 und die Texte. Welche Anzeige ist interessant für Sie? Kreuzen Sie an: a oder b.",
+          itemType: v("ab", UT, "S. 16–17"), optionsPerItem: v(2, UT, "S. 16–17: zwei Anzeigen pro Aufgabe"),
+          itemCount: v(5, UT, "S. 16–17: Aufgaben 6–10"), pointsPerItem: v(1, UT, "Derived: 15 items, 15 points"),
+          textTypes: v(["Anzeige", "Webseite"], UT, "S. 16–17"),
+        },
+        {
+          id: "lesen-3", number: 3, titleDe: "Lesen Teil 3",
+          descriptionEn: "Five short signs or notices (school, post office, station, restaurant, bus stop); true/false.",
+          instructionsDe: "Lesen Sie die Texte und die Aufgaben 11–15. Kreuzen Sie an: Richtig oder Falsch.",
+          itemType: v("true_false", UT, "S. 18–19"), itemCount: v(5, UT, "S. 18–19: Aufgaben 11–15"),
+          pointsPerItem: v(1, UT, "Derived: 15 items, 15 points"), textTypes: v(["Schild", "Aushang"], UT, "S. 18–19"),
+        },
       ],
     },
     {
       id: "schreiben", skill: "writing", titleDe: "Schreiben", titleEn: "Writing", order: 3, component: "written",
-      durationMinutes: v(null, PA1, "Timed with Lesen (45 min)"), timeGroupId: "lesen-schreiben", rawMax: u(15, PAGE_ONLY), scaledMax: u(null, PAGE_ONLY),
+      durationMinutes: v(20, UT, "S. 13: ca. 20 Minuten"), timeGroupId: "lesen-schreiben", rawMax: v(15, UT, "Ergebnisblatt M10: Punkte /15 (Teil 1 5 + Teil 2 10)"), scaledMax: v(15, UT, "Ergebnisblatt M10: Punkte /15, no conversion"),
       parts: [
-        proposedPart({ sectionId: "schreiben", number: 1, titleDe: "Schreiben Teil 1", descriptionEn: "Complete a form.", instructionsDe: "Füllen Sie das Formular aus.", itemType: "short_text", itemCount: 5, textTypes: ["Formular"], note: PAGE_ONLY }),
-        proposedPart({ sectionId: "schreiben", number: 2, titleDe: "Schreiben Teil 2", descriptionEn: "Short message with guiding points.", instructionsDe: "Schreiben Sie eine kurze Nachricht zu allen Punkten.", itemType: "writing", itemCount: 1, textTypes: ["Kurzmitteilung"], writing: proposedWriting({ approxWords: 30, criteria: ["Inhaltspunkte", "Textsorte"], maxRawPoints: 10 }) }),
+        {
+          id: "schreiben-1", number: 1, titleDe: "Schreiben Teil 1",
+          descriptionEn: "Read a short text and fill in the five missing fields of a partly completed form.",
+          instructionsDe: "Lesen Sie den Text. Schreiben Sie die fünf fehlenden Informationen in das Formular.",
+          itemType: v("short_text", UT, "S. 20"), itemCount: v(5, UT, "S. 20: fünf fehlende Informationen"),
+          pointsPerItem: v(1, UT, "Derived: Schreiben 15 − Teil 2 max. 10 = 5 for five fields"), textTypes: v(["Formular"], UT, "S. 20"),
+        },
+        {
+          id: "schreiben-2", number: 2, titleDe: "Schreiben Teil 2",
+          descriptionEn: "Short message covering three guiding points, one to two sentences each (about 30 words), with greeting and closing.",
+          instructionsDe: "Schreiben Sie zu jedem Punkt ein bis zwei Sätze (circa 30 Wörter). Schreiben Sie auch eine Anrede und einen Gruß.",
+          itemType: v("writing", UT, "S. 21"), itemCount: v(1, UT, "S. 21"), textTypes: v(["Kurzmitteilung", "E-Mail"], UT, "S. 21"),
+          writing: {
+            approxWords: v(30, UT, "S. 21: circa 30 Wörter"),
+            criteria: v(
+              ["Inhaltspunkt 1 (0 / 1,5 / 3)", "Inhaltspunkt 2 (0 / 1,5 / 3)", "Inhaltspunkt 3 (0 / 1,5 / 3)", "Kommunikative Gestaltung: Anrede, Gruß (0 / 0,5 / 1)"],
+              UT,
+              "Bewertung Schreiben Teil 2",
+            ),
+            maxRawPoints: v(10, UT, "Es können maximal 10 Punkte vergeben werden."),
+          },
+        },
       ],
     },
     {
       id: "sprechen", skill: "speaking", titleDe: "Sprechen", titleEn: "Speaking", order: 4, component: "oral",
-      durationMinutes: v(15, PA1, "ca. 15 Minuten"), rawMax: u(15, PAGE_ONLY), scaledMax: u(null, PAGE_ONLY),
-      parts: [1, 2, 3].map((n) => ({
-        id: `sprechen-${n}`, number: n, titleDe: `Sprechen Teil ${n}`,
-        descriptionEn: ["Introduce yourself.", "Ask for and give information.", "Make requests and respond."][n - 1],
-        instructionsDe: ["Stellen Sie sich vor.", "Stellen Sie eine Frage und antworten Sie.", "Formulieren Sie eine Bitte und reagieren Sie."][n - 1],
-        itemType: v("speaking" as const, PA1), itemCount: u(1, PAGE_ONLY), textTypes: u(["Karte"], PAGE_ONLY),
-        speaking: speakingSpec({ format: u(n === 1 ? "monologue" : "interaction", PAGE_ONLY), prepSeconds: v(0, PA1, "No preparation time"), responseSeconds: u(60, PAGE_ONLY), maxRawPoints: u(null, PAGE_ONLY) }),
-      })),
+      durationMinutes: v(15, PA1, "ca. 15 Minuten"), rawMax: v(15, UT, "M10: Punkte /15 (3 + 6 + 6)"), scaledMax: v(15, UT, "M10: Punkte /15, no conversion"),
+      parts: [
+        {
+          id: "sprechen-1", number: 1, titleDe: "Sprechen Teil 1 — Sich vorstellen",
+          descriptionEn: "Introduce yourself with seven keywords, spell a word and say a number.",
+          instructionsDe: "Stellen Sie sich vor. Sprechen Sie über: Name, Alter, Land, Wohnort, Sprachen, Beruf, Hobby. Buchstabieren Sie dann ein Wort und nennen Sie eine Zahl.",
+          itemType: v("speaking", UT, "S. 24"), itemCount: v(1, UT, "S. 24"), textTypes: v(["Stichwortliste"], UT, "S. 24"),
+          speaking: speakingSpec({ format: v("monologue", UT, "S. 24"), prepSeconds: v(0, PA1, "No preparation time"), responseSeconds: u(60, "ca. 3 Minuten for the whole group; time per candidate is not stated."), maxRawPoints: v(3, UT, "M10: Vorstellen, Buchstabieren, Zahlen je max. 1") }),
+        },
+        {
+          id: "sprechen-2", number: 2, titleDe: "Sprechen Teil 2 — Um Informationen bitten und Informationen geben",
+          descriptionEn: "Two themes with word cards; ask two questions and answer two questions.",
+          instructionsDe: "Sie bekommen zwei Karten mit einem Thema und einem Wort. Stellen Sie eine Frage zu Ihrer Karte. Ihre Partnerin / Ihr Partner antwortet.",
+          itemType: v("speaking", UT, "S. 25"), itemCount: v(1, UT, "S. 25"), textTypes: v(["Wortkarte (Thema + Wort)"], UT, "S. 25: zwei Themen, je sechs Karten"),
+          speaking: speakingSpec({ format: v("interaction", UT, "S. 25"), prepSeconds: v(0, PA1, "No preparation time"), responseSeconds: u(60, "ca. 4 Minuten for the whole group; time per candidate is not stated."), maxRawPoints: v(6, UT, "M10: Frage max. 2, Antwort max. 1, zweimal") }),
+        },
+        {
+          id: "sprechen-3", number: 3, titleDe: "Sprechen Teil 3 — Bitten formulieren und darauf reagieren",
+          descriptionEn: "With action cards, make two requests and react to two requests.",
+          instructionsDe: "Sie bekommen zwei Karten. Formulieren Sie eine Bitte zu Ihrer Karte. Ihre Partnerin / Ihr Partner reagiert.",
+          itemType: v("speaking", UT, "S. 26"), itemCount: v(1, UT, "S. 26"), textTypes: u(["Handlungskarte (Bild)"], "Handlungskarten are verified; that they show pictures is not visible in the text version read."),
+          speaking: speakingSpec({ format: v("interaction", UT, "S. 26"), prepSeconds: v(0, PA1, "No preparation time"), responseSeconds: u(60, "ca. 4 Minuten for the whole group; time per candidate is not stated."), maxRawPoints: v(6, UT, "M10: Bitte max. 2, Reaktion max. 1, zweimal") }),
+        },
+      ],
     },
   ],
   scoring: {
-    reporting: u("total", PAGE_ONLY),
-    totalMax: u(null, PAGE_ONLY),
-    passRule: u(null, PAGE_ONLY),
-    rounding: u("round_total", PAGE_ONLY),
+    reporting: v("total", UT, "Testformat S. 5: Gesamt 60"),
+    totalMax: v(60, UT, "Testformat S. 5: Gesamt 60"),
+    passRule: u({ kind: "total_min", minTotal: 36 }, "The Übungstest lists Prädikate (ausreichend from 36 points, below that 'teilgenommen') but states no explicit pass rule; confirm from the telc Prüfungsordnung."),
+    rounding: v("half_points", UT, "Bands use half points, e.g. 48–53,5"),
+    gradeBands: v(TELC_A1_GRADE_BANDS, UT, "S. 5: 54–60 sehr gut, 48–53,5 gut, 42–47,5 befriedigend, 36–41,5 ausreichend, 0–35,5 teilgenommen"),
   },
-  adminNotes: ["Only parts and durations are verified. Confirm items, points and pass rule from the telc A1 Übungstest before publication."],
+  adminNotes: [
+    "Item counts, playbacks and points come from the telc Start Deutsch 1 Übungstest 1 (2021). Points per objective item (1) are derived from the 15-point section totals.",
+    "Pass rule is not stated explicitly; it is inferred from the lowest passing Prädikat (ausreichend, 36 of 60).",
+  ],
 };
 
 /* ------------------------------------------------------------------------------------------ */

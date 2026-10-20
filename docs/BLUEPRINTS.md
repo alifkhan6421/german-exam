@@ -22,7 +22,7 @@ What unverified facts do in the app:
 | Goethe A2 | 50 |
 | Goethe B1 | 58 |
 | Goethe B2 | 48 |
-| telc A1 / Start Deutsch 1 | 60 (incl. pass rule) |
+| telc A1 / Start Deutsch 1 | 5 (incl. pass rule) |
 | telc A2 / Start Deutsch 2 | 63 (incl. pass rule) |
 | telc B1 / Zertifikat Deutsch | 86 (incl. pass rule) |
 | telc B2 | 2 (incl. pass rule) |
@@ -211,70 +211,15 @@ What unverified facts do in the app:
 - **sections[sprechen].parts[sprechen-1].speaking.maxRawPoints**: null. Module total is verified; the per-part breakdown is not stated in the sources read.
 - **sections[sprechen].parts[sprechen-2].speaking.maxRawPoints**: null. Module total is verified; the per-part breakdown is not stated in the sources read.
 
-### Start Deutsch 1 / telc Deutsch A1 (`telc-a1-sd1`, 2026.10.1)
+### Start Deutsch 1 / telc Deutsch A1 (`telc-a1-sd1`, 2026.10.2)
 
-60 fact(s) need administrator confirmation:
+5 fact(s) need administrator confirmation:
 
-- **sections[hoeren].rawMax**: 15. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[hoeren].scaledMax**: null. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[hoeren].parts[hoeren-1].itemType**: "mc". The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[hoeren].parts[hoeren-1].itemCount**: 6. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[hoeren].parts[hoeren-1].optionsPerItem**: 3. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[hoeren].parts[hoeren-1].playbacks**: 2. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[hoeren].parts[hoeren-1].textTypes**: ["Alltagsgespräch"]. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[hoeren].parts[hoeren-2].itemType**: "true_false". The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[hoeren].parts[hoeren-2].itemCount**: 4. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[hoeren].parts[hoeren-2].playbacks**: 1. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[hoeren].parts[hoeren-2].textTypes**: ["Durchsage"]. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[hoeren].parts[hoeren-3].itemType**: "mc". The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[hoeren].parts[hoeren-3].itemCount**: 5. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[hoeren].parts[hoeren-3].optionsPerItem**: 3. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[hoeren].parts[hoeren-3].playbacks**: 2. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[hoeren].parts[hoeren-3].textTypes**: ["Telefonansage"]. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[lesen].rawMax**: 15. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[lesen].scaledMax**: null. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[lesen].parts[lesen-1].itemType**: "true_false". The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[lesen].parts[lesen-1].itemCount**: 5. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[lesen].parts[lesen-1].textTypes**: ["Notiz","E-Mail"]. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[lesen].parts[lesen-2].itemType**: "ab". The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[lesen].parts[lesen-2].itemCount**: 5. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[lesen].parts[lesen-2].optionsPerItem**: 2. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[lesen].parts[lesen-2].textTypes**: ["Anzeigen"]. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[lesen].parts[lesen-3].itemType**: "true_false". The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[lesen].parts[lesen-3].itemCount**: 5. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[lesen].parts[lesen-3].textTypes**: ["Schild","Aushang"]. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[schreiben].rawMax**: 15. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[schreiben].scaledMax**: null. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[schreiben].parts[schreiben-1].itemType**: "short_text". The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[schreiben].parts[schreiben-1].itemCount**: 5. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[schreiben].parts[schreiben-1].textTypes**: ["Formular"]. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[schreiben].parts[schreiben-2].itemType**: "writing". Per-part detail not stated in the official sources read; confirm against a current Modellsatz.
-- **sections[schreiben].parts[schreiben-2].itemCount**: 1. Per-part detail not stated in the official sources read; confirm against a current Modellsatz.
-- **sections[schreiben].parts[schreiben-2].textTypes**: ["Kurzmitteilung"]. Per-part detail not stated in the official sources read; confirm against a current Modellsatz.
-- **sections[schreiben].parts[schreiben-2].writing.approxWords**: 30. Writing task details not stated in the sources read.
-- **sections[schreiben].parts[schreiben-2].writing.criteria**: ["Inhaltspunkte","Textsorte"]. Writing task details not stated in the sources read.
-- **sections[schreiben].parts[schreiben-2].writing.maxRawPoints**: 10. Writing task details not stated in the sources read.
-- **sections[sprechen].rawMax**: 15. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[sprechen].scaledMax**: null. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[sprechen].parts[sprechen-1].itemCount**: 1. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[sprechen].parts[sprechen-1].textTypes**: ["Karte"]. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[sprechen].parts[sprechen-1].speaking.format**: "monologue". The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[sprechen].parts[sprechen-1].speaking.responseSeconds**: 60. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[sprechen].parts[sprechen-1].speaking.maxRawPoints**: null. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[sprechen].parts[sprechen-2].itemCount**: 1. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[sprechen].parts[sprechen-2].textTypes**: ["Karte"]. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[sprechen].parts[sprechen-2].speaking.format**: "interaction". The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[sprechen].parts[sprechen-2].speaking.responseSeconds**: 60. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[sprechen].parts[sprechen-2].speaking.maxRawPoints**: null. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[sprechen].parts[sprechen-3].itemCount**: 1. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[sprechen].parts[sprechen-3].textTypes**: ["Karte"]. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[sprechen].parts[sprechen-3].speaking.format**: "interaction". The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[sprechen].parts[sprechen-3].speaking.responseSeconds**: 60. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **sections[sprechen].parts[sprechen-3].speaking.maxRawPoints**: null. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **scoring.reporting**: "total". The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **scoring.totalMax**: null. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **scoring.passRule**: null. The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
-- **scoring.rounding**: "round_total". The official exam page states the number of parts and durations only; item counts, points and playback rules need confirmation from the telc handbook or Übungstest.
+- **sections[sprechen].parts[sprechen-1].speaking.responseSeconds**: 60. ca. 3 Minuten for the whole group; time per candidate is not stated.
+- **sections[sprechen].parts[sprechen-2].speaking.responseSeconds**: 60. ca. 4 Minuten for the whole group; time per candidate is not stated.
+- **sections[sprechen].parts[sprechen-3].textTypes**: ["Handlungskarte (Bild)"]. Handlungskarten are verified; that they show pictures is not visible in the text version read.
+- **sections[sprechen].parts[sprechen-3].speaking.responseSeconds**: 60. ca. 4 Minuten for the whole group; time per candidate is not stated.
+- **scoring.passRule**: {"kind":"total_min","minTotal":36}. The Übungstest lists Prädikate (ausreichend from 36 points, below that 'teilgenommen') but states no explicit pass rule; confirm from the telc Prüfungsordnung.
 
 ### Start Deutsch 2 / telc Deutsch A2 (`telc-a2-sd2`, 2026.10.1)
 

@@ -19,5 +19,11 @@ describe("production seed", () => {
     expect(v[0].status).toBe("draft");
     // Blocked until audio is produced and the blueprint is confirmed by an administrator.
     expect(v[0].validation.ok).toBe(false);
+
+    const telc = await db.query<{ mock_number: number; status: string; validation: { ok: boolean } }>(
+      `select e.mock_number, v.status, v.validation from exam_versions v join exams e on e.current_version_id = v.id where e.track_key = 'telc-a1-sd1' order by e.mock_number`,
+    );
+    expect(telc.map((t) => t.mock_number)).toEqual([1, 2, 3, 4, 5]);
+    expect(telc.every((t) => t.status === "draft" && !t.validation.ok)).toBe(true);
   });
 });

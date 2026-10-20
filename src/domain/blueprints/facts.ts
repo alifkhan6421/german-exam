@@ -77,6 +77,12 @@ export const SOURCES = {
     url: "https://www.telc.net/en/language-examinations/certificate-exams/german/start-german1-telc-german-a1/",
     retrievedAt: VERIFIED_AT,
   },
+  telcA1Uebungstest1: {
+    id: "telcA1Uebungstest1",
+    title: "telc Start Deutsch 1 — Übungstest 1 (11. Auflage 2021)",
+    url: "https://shop.telc.net/media/catalog/product/file//2/0/20210103_5070-b00-010106_web_1.pdf",
+    retrievedAt: "2026-10-20",
+  },
   telcA2Page: {
     id: "telcA2Page",
     title: "Start Deutsch 2 / telc Deutsch A2 — exam page",
@@ -114,6 +120,15 @@ export type SourceId = keyof typeof SOURCES;
 export function sources(...ids: SourceId[]): BlueprintSource[] {
   return ids.map((id) => SOURCES[id]);
 }
+
+/** telc Start Deutsch 1 Prädikate (54/48/42/36 of 60 points), expressed as percentages. */
+export const TELC_A1_GRADE_BANDS = [
+  { min: 90, max: 100, labelDe: "sehr gut" },
+  { min: 80, max: 89, labelDe: "gut" },
+  { min: 70, max: 79, labelDe: "befriedigend" },
+  { min: 60, max: 69, labelDe: "ausreichend" },
+  { min: 0, max: 59, labelDe: "teilgenommen" },
+];
 
 export const GOETHE_GRADE_BANDS = [
   { min: 90, max: 100, labelDe: "sehr gut" },

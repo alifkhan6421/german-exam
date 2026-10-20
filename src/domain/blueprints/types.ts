@@ -132,7 +132,7 @@ export interface ScoringModel {
   totalMax: Fact<number | null>;
   passRule: Fact<PassRule | null>;
   /** Rounding behaviour applied after scaling. */
-  rounding: Fact<"round_total" | "round_each_section">;
+  rounding: Fact<"round_total" | "round_each_section" | "half_points">;
   gradeBands?: Fact<{ min: number; max: number; labelDe: string }[]>;
 }
 

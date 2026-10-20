@@ -214,7 +214,8 @@ export function scoreAttempt(args: {
   let total: ResultSummary["total"] = null;
   if (bp.scoring.reporting.value === "total" && allSectionsAttempted && allComplete && bp.scoring.totalMax.value) {
     const sum = attempted.reduce((n, s) => n + (s.scaledPoints ?? 0), 0);
-    total = { points: Math.min(Math.round(sum), bp.scoring.totalMax.value), max: bp.scoring.totalMax.value };
+    const rounded = bp.scoring.rounding.value === "half_points" ? Math.round(sum * 2) / 2 : Math.round(sum);
+    total = { points: Math.min(rounded, bp.scoring.totalMax.value), max: bp.scoring.totalMax.value };
   }
 
   let pass: ResultSummary["pass"];

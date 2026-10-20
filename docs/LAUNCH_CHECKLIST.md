@@ -22,7 +22,10 @@ content items: nothing can be published while they are open.
       `content/audio/goethe-a1-sd1-mock-1/`. In **Admin → Audio** click **Import recordings**, listen to and approve
       each one (no background ambience was added), then run validation, send the draft to review, approve it and
       publish it. Imported recordings stay unapproved until a reviewer approves them.
-- [ ] **The other 39 mock exams**: generate them with **Admin → AI generator** (or write them in the editor), then
+- [ ] **telc A1 Mocks 1–5**: written (original content) and imported as unpublished drafts. Confirm the telc A1
+      blueprint, review each mock in the editor, produce and approve listening audio (17 scripts per mock), then
+      validate, review and publish.
+- [ ] **The other 34 mock exams**: generate them with **Admin → AI generator** (or write them in the editor), then
       check each one for originality, level and answer-key correctness, produce audio, review and publish.
       Generated content is never published automatically.
 - [ ] Decide which exams are free and which are premium (**Admin → Exams → availability**).
