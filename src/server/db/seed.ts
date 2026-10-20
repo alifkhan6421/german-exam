@@ -8,6 +8,9 @@ import { TELC_A1_MOCKS } from "@/content/telc-a1";
 import { hashPassword } from "../auth/password";
 import type { Db } from "./index";
 
+/** Bump when authored seed content changes so hosted deployments re-run SEED_ON_START. */
+export const SEED_CONTENT_REVISION = "2026-10-20-telc-a1";
+
 export const DEV_USERS = [
   { email: "admin@example.com", password: "admin-dev-123", role: "super_admin", name: "Dev Admin" },
   { email: "editor@example.com", password: "editor-dev-123", role: "content_admin", name: "Dev Content Admin" },
@@ -138,23 +141,43 @@ export async function seed(db: Db, opts: { dev: boolean; demo?: boolean }) {
   }
 }
 
-/** Import authored content as an unpublished v1 draft, unless the exam already has a version. */
+/**
+ * Import authored content as an unpublished draft. Skips exams that already have real content;
+ * an untouched editor skeleton (placeholder text only) is kept as history and superseded.
+ */
 async function importDraft(db: Db, trackKey: string, mockNumber: number, input: unknown) {
-  const exam = await db.one<{ id: string; current_version_id: string | null }>(
-    `select id, current_version_id from exams where track_key = $1 and mock_number = $2`,
+  const exam = await db.one<{ id: string; current_version_id: string | null; published_version_id: string | null }>(
+    `select id, current_version_id, published_version_id from exams where track_key = $1 and mock_number = $2`,
     [trackKey, mockNumber],
   );
-  if (!exam || exam.current_version_id) return;
+  if (!exam || exam.published_version_id) return;
+  if (exam.current_version_id) {
+    const current = await db.one<{ status: string; locked: boolean; content: unknown }>(
+      `select status, locked, content from exam_versions where id = $1`,
+      [exam.current_version_id],
+    );
+    if (!current || current.status !== "draft" || current.locked || !isUntouchedSkeleton(current.content)) return;
+  }
   const bp = getBlueprint(trackKey)!;
   const content = ExamContentSchema.parse(input);
   const report = validateExam(content, bp, { blueprintConfirmed: false, allowDevPreviewAudio: false });
   const versionId = randomUUID();
   await db.tx(async (tx) => {
+    const next = (await tx.one<{ n: number }>(`select coalesce(max(version), 0)::int + 1 as n from exam_versions where exam_id = $1`, [exam.id]))!.n;
     await tx.query(
       `insert into exam_versions (id, exam_id, version, blueprint_key, blueprint_version, content, status, validation, locked)
-       values ($1, $2, 1, $3, $4, $5::jsonb, 'draft', $6::jsonb, false)`,
-      [versionId, exam.id, bp.key, bp.version, JSON.stringify(content), JSON.stringify(report)],
+       values ($1, $2, $3, $4, $5, $6::jsonb, 'draft', $7::jsonb, false)`,
+      [versionId, exam.id, next, bp.key, bp.version, JSON.stringify(content), JSON.stringify(report)],
     );
     await tx.query(`update exams set current_version_id = $1, updated_at = now() where id = $2`, [versionId, exam.id]);
   });
+}
+
+/** True when every prompt and script line is still the editor's placeholder text. */
+function isUntouchedSkeleton(content: unknown): boolean {
+  const c = content as { sections?: { parts?: { items?: { prompt?: string; type?: string }[] }[] }[]; scripts?: { turns?: { text?: string }[] }[] };
+  const items = (c.sections ?? []).flatMap((s) => (s.parts ?? []).flatMap((p) => p.items ?? []));
+  const objective = items.filter((i) => i.type !== "writing" && i.type !== "speaking");
+  const turns = (c.scripts ?? []).flatMap((s) => s.turns ?? []);
+  return objective.length > 0 && objective.every((i) => i.prompt === "[Aufgabe]") && turns.every((t) => t.text === "[Skript hier einfügen]");
 }

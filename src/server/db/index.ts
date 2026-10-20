@@ -146,9 +146,9 @@ async function seedOnStart(db: Db) {
   const mode = process.env.SEED_ON_START;
   if (mode !== "reference" && mode !== "demo") return;
   if (mode === "demo" && config.isProduction) throw new Error("SEED_ON_START=demo is not allowed with APP_ENV=production");
-  const { seed } = await import("./seed");
+  const { seed, SEED_CONTENT_REVISION } = await import("./seed");
   const { BLUEPRINTS } = await import("@/domain/blueprints");
-  const marker = `seed/${mode}/${BLUEPRINTS.map((b) => `${b.key}@${b.version}`).join(",")}`;
+  const marker = `seed/${mode}/${SEED_CONTENT_REVISION}/${BLUEPRINTS.map((b) => `${b.key}@${b.version}`).join(",")}`;
   if (await db.one(`select 1 from _migrations where name = $1`, [marker])) return;
   await seed(db, { dev: false, demo: mode === "demo" });
   await db.query(`insert into _migrations (name) values ($1) on conflict do nothing`, [marker]);
